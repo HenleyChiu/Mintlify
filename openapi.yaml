@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: B2B Sales Signals API
-  description: Comprehensive API for retrieving B2B sales signals including tech adoption signals (purchases, churns, usage changes) and hiring signals (job postings)
+  description: Comprehensive API for retrieving B2B sales signals including tech adoption signals (purchases, churns, usage changes) and hiring signals (job postings) 
   version: 1.0.0
   contact:
     url: https://bloomberry.com
