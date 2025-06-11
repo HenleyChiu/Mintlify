@@ -1,0 +1,719 @@
+openapi: 3.0.3
+info:
+  title: B2B Sales Signals API
+  description: Comprehensive API for retrieving B2B sales signals including tech adoption signals (purchases, churns, usage changes) and hiring signals (job postings)
+  version: 1.0.0
+  contact:
+    url: https://bloomberry.com
+servers:
+  - url: https://api.bloomberry.com
+    description: Production server
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /signals/tech.json:
+    get:
+      summary: Get tech signals
+      description: Returns B2B tech signals (purchases, churns, usage changes) for a given category or company, sorted by most recent first
+      tags:
+        - Tech Signals
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Signals per page
+          required: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 1000
+        - name: begin_date
+          in: query
+          description: Start date for filtering signals. Defaults to the first date in our dataset.
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-06-01"
+        - name: end_date
+          in: query
+          description: End date for filtering signals. Defaults to end of today.
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-06-01"
+        - name: category
+          in: query
+          description: The category to get tech signals for. Either category OR domain MUST be specified but not both. All possible categories are available at https://bloomberry.com/categories. Only 1 category can be specified.
+          required: false
+          schema:
+            type: string
+            example: "Human Capital Management"
+        - name: domain
+          in: query
+          description: The domain of the company to get signals. For example, ford.com to get tech signals for Ford. If domain is not specified, category MUST be specified.
+          required: false
+          schema:
+            type: string
+            example: "ford.com"
+        - name: company_employee_size_range
+          in: query
+          description: Only show signals from companies with number of employees that match the specified size ranges. Separate multiple values with semicolon.
+          required: false
+          schema:
+            type: string
+            example: "2-10;11-50"
+        - name: company_industry
+          in: query
+          description: Only show signals from companies in the specified industries. We look at the LinkedIn company page to determine industries. All possible industries are available at https://bloomberry.com/industries. Separate multiple values with semicolon.
+          required: false
+          schema:
+            type: string
+            example: "Software Development;IT Services and IT Consulting"
+        - name: company_country
+          in: query
+          description: Only show signals from companies headquartered in the specified countries. Country codes must be in ISO 3166-1 alpha-2 format. Separate multiple values with semicolon.
+          required: false
+          schema:
+            type: string
+            example: "US;GB"
+            pattern: "^[A-Z]{2}(;[A-Z]{2})*$"
+      responses:
+        "200":
+          description: Success response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TechSignalsResponse"
+              example:
+                signals:
+                  - id: "4433764"
+                    change_date: "2025-06-06T19:59:44-04:00"
+                    change_type: "subscribed"
+                    change_description: "Rodriguez Strategies subscribed to an account payable and receivable automation platform"
+                    linkedin_username: "rodriguezstrategies"
+                    linkedin_company_id: "9412744"
+                    domain: "rodriguezstrategies.com"
+                    company_name: "Rodriguez Strategies"
+                    company_logo: "https://media.licdn.com/dms/image/v2/C560BAQGW4JcKeWR7gA/company-logo_200_200/company-logo_200_200/0/1630638468536/rodriguezstrategies_logo?e=2147483647&v=beta&t=1m_sqXB68840sPORZ_oXeyx1jVTYdM1YxPTqlVFeaTo"
+                    company_address: null
+                    industry: "Government Relations"
+                    company_size_range: "2-10"
+                    company_description: "Significant public policy is shaped at the local level and then spreads outward. At Rodriguez Strategies, our team navigates the political culture of any city, county, or region. We are a boutique public affairs firm where clients receive tailor-made blueprints designed to address their specific challenges. We pride ourselves on the ability to create unique and targeted plans designed for success. Our experienced leadership team is intimately involved in every engagement from start to finish and can quickly and effectively deploy resources to achieve the policy and advocacy goals of our clients.\n\nWe work with clients across the business, political, and nonprofit sectors to drive THEIR agenda. Absorbing complicated policy materials and seeking solutions is our specialty, and we immerse ourselves in the issue at hand. We use a unique combination of research, coalition building, and local outreach to mobilize stakeholders around our clients' goals."
+                    country: "US"
+                    vendor_name: null
+                    vendor_category: "account payable and receivable automation"
+                    vendor_market: "SMB"
+                    vendor_notes: "vendor management"
+                    vendor_market_leader: true
+                    vendor_url: null
+                    context_url: null
+                    has_self_service_trial: false
+                  - id: "4433763"
+                    change_date: "2025-06-06T19:59:32-04:00"
+                    change_type: "usage"
+                    change_description: "Pure World™ installed LoyaltyLion on their website"
+                    linkedin_username: null
+                    linkedin_company_id: null
+                    domain: "pureworldshop.com"
+                    company_name: "Pure World™"
+                    company_logo: "https://cdn.shopify.com/s/files/1/1949/0713/files/wrappedtext7-04_705b40fb-deae-4f9e-940a-0a928c8050b4.png?v=1632253039"
+                    company_address: null
+                    industry: "Retail"
+                    company_size_range: "2-10"
+                    company_description: "Pure World is a designer of sustainable adventure gear; namely hemp backpacks and bags which are hand-crafted in Nepal."
+                    country: "US"
+                    vendor_name: "LoyaltyLion"
+                    vendor_category: "loyalty management"
+                    vendor_market: "Shopify"
+                    vendor_notes: ""
+                    vendor_market_leader: true
+                    vendor_url: "loyaltylion.com"
+                    context_url: null
+                    has_self_service_trial: false
+                pagination:
+                  page: 1
+                  per_page: 2
+                  total_pages: 26721
+                  total_items: 53442
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+
+  /signals/jobs.json:
+    get:
+      summary: Get job postings
+      description: Returns job postings, with full-text descriptions containing a given keyword, for a specific company, or for a specific normalized job title
+      tags:
+        - Hiring Signals
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: keyword
+          in: query
+          description: A keyword to search for in the full-text description of job postings
+          required: false
+          schema:
+            type: string
+            example: "LLMs"
+        - name: normalized_job_titles
+          in: query
+          description: A list of normalized job titles to filter by, separated by ';'. The entire list of normalized job titles can be found here https://bloomberry.com/normalized-job_titles
+          required: false
+          schema:
+            type: string
+            example: "backend engineer;frontend engineer"
+        - name: domain
+          in: query
+          description: The website domain of the company to filter by. Note that one of keyword, normalized_job_titles, and domain MUST be passed
+          required: false
+          schema:
+            type: string
+            example: "ford.com"
+        - name: search_job_title_only
+          in: query
+          description: if keyword is passed, and this is true, we'll search just for the title of the job posting, instead of BOTH the title and the description
+          required: false
+          schema:
+            type: boolean
+            default: false
+            example: false
+        - name: begin_date
+          in: query
+          description: Start date for filtering job postings. Defaults to a week ago.
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-06-01"
+        - name: end_date
+          in: query
+          description: End date for filtering job postings. Defaults to end of today.
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-06-01"
+        - name: limit
+          in: query
+          description: Job postings per page
+          required: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 1000
+        - name: active_only
+          in: query
+          description: True if you only want to see active job postings (not deleted or taken down), false otherwise
+          required: false
+          schema:
+            type: boolean
+            default: true
+            example: true
+        - name: countries
+          in: query
+          description: Only show jobs from companies headquartered in the specified countries. Country codes must be in ISO 3166-1 alpha-2 format. Separate multiple values with ';'
+          required: false
+          schema:
+            type: string
+            example: "US;GB"
+            pattern: "^[A-Z]{2}(;[A-Z]{2})*$"
+        - name: exact_match
+          in: query
+          description: True if the job posting must match the keyword passed in EXACTLY, in the order passed. For example, if keyword = "content marketing", only job postings with "content marketing" together as an exact phrase will be returned
+          required: false
+          schema:
+            type: boolean
+            default: true
+            example: true
+        - name: company_size_range
+          in: query
+          description: Only show jobs from companies with number of employees that match the specified size ranges. Separate multiple values with ';'. Possible ranges are 2-10, 11-50, 51-200, 201-500, 501-1,000, 1,001-5,000, 5,001-10,000
+          required: false
+          schema:
+            type: string
+            example: "2-10;11-50"
+        - name: remote_only
+          in: query
+          description: If true, only show jobs that are marked as remote
+          required: false
+          schema:
+            type: boolean
+            default: false
+            example: false
+        - name: show_facets
+          in: query
+          description: If true, show aggregate statistics on number of jobs found per month
+          required: false
+          schema:
+            type: boolean
+            default: false
+            example: false
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: category
+          in: query
+          description: The category to get job postings for. All possible categories are available at https://bloomberry.com/categories. Only 1 category can be specified
+          required: false
+          schema:
+            type: string
+            example: "Human Capital Management"
+        - name: company_employee_size_range
+          in: query
+          description: Only show job postings from companies with number of employees that match the specified size ranges. Separate multiple values with ';'. Possible ranges are 2-10, 11-50, 51-200, 201-500, 501-1,000, 1,001-5,000, 5,001-10,000
+          required: false
+          schema:
+            type: string
+            example: "2-10;11-50"
+        - name: company_industry
+          in: query
+          description: Only show job postings from companies in the specified industries. We look at the LinkedIn company page to determine industries. All possible industries are available at https://bloomberry.com/industries. Separate multiple values with ';'
+          required: false
+          schema:
+            type: string
+            example: "Software Development;IT Services and IT Consulting"
+        - name: company_country
+          in: query
+          description: Only show job postings from companies headquartered in the specified countries. Country codes must be in ISO 3166-1 alpha-2 format. Separate multiple values with ';'
+          required: false
+          schema:
+            type: string
+            example: "US;GB"
+            pattern: "^[A-Z]{2}(;[A-Z]{2})*$"
+      responses:
+        "200":
+          description: Success response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobsResponse"
+              example:
+                jobs:
+                  - id: 67499973
+                    company_country: "SE"
+                    title: "Site Reliability Engineer"
+                    normalized_job_title: "devops engineer (SRE)"
+                    regions: []
+                    region: "Hybrid, "
+                    description: "Career menu Start Jobs Departments People Employee Log in Candidate Log in to Connect Homepage medius.com Facebook X LinkedIn Mail Research & Dev · Cracow · Hybrid Site Reliability Engineer Great Team, Opportunity for Career & Professional Development, Collaborative and Meritocratic work culture and Supportive Leadership Apply for this job About Medius Medius is a Swedish origin company & a leading global provider of cloud-based SaaS spend management solutions, helping organizations drive their business forward by enabling best-in-class process efficiency, cost-savings, and greater financial control. Spend management doesn't ring a bell? This term describes the process from placing an order through its delivery, verification, invoicing to its payment. Our products help companies at every step of the purchasing process, increasing their security and speeding it up. We use the latest advances in artificial intelligence (AI) and machine learning to automatically capture and process invoices. If you are seeking a stimulating environment characterized by unparalleled momentum and rapid growth, look no further. Join us as we lead the charge in reshaping the future of spend management, setting new standards of excellence, and driving impactful change across industries. Currently we are looking for a Site Reliability Engineer to strengthen our Capture team! The Capture team uses intelligent technology such as optical character recognition (OCR), artificial intelligence (AI), and machine learning (ML) to intuitively extract relevant data from paper and digital invoices - including PDF, e-invoices, and EDI - eliminating the need for manual checks and reviews. What you'll do? Make sure our cloud applications work great for customers. Ensure our platform is the best to develop and run applications. Find and implement improvements in Microsoft Azure infrastructure to ensure a secure, performant, and cost-effective environment. Participate in defining best practices for how we should use Microsoft Azure effectively. Oversee deployment of new software in production environments. Automate all the things. Monitor, measure and troubleshoot all aspects of our application and infrastructure. Participate in incident management and postmortems with a focus on continuous improvement, ensuring lessons learned are shared and applied. What kind of experience is relevant? A solid knowledge of information technologies and cloud infrastructure: Minimum 3 to 4 years of experience in a DevOps or infrastructure role. A system administrator (admin) background is preferred over a purely development background. Running complex cloud native applications on a public cloud infrastructure, preferably Azure. Operating Kubernetes clusters in production. IaC (Arm/Bicep/Terraform), GitOps You need to be able to write code to solve problem. We do a lot of scripting, and you should also be comfortable with developing in C# and .NET CI / CD tools (Azure DevOps) are important to us. Experience in this area is useful! Monitoring is also a big part of what we do (Grafana, Elasticsearch). Experience in this area is relevant. We use both Windows and Linux, you should be comfortable and willing to work with both."
+                    displayed_url: "https://career.medius.com/jobs/6031145-site-reliability-engineer"
+                    currency_code: null
+                    min_salary_range: null
+                    max_salary_range: null
+                    avg_salary_range: null
+                    min_hourly_rate: null
+                    max_hourly_rate: null
+                    avg_hourly_rate: null
+                    min_experience_years: 3
+                    max_experience_years: 4
+                    remote: 0
+                    snapshot_date: "2025-06-10"
+                    created_at: "2025-06-10T08:32:16Z"
+                    updated_at: "2025-06-10T08:33:18Z"
+                    linkedin_company_id: 33901
+                    inactive: 0
+                    company_number_of_employees: 751
+                    company_employee_size_range: "501-1,000"
+                    company_industry: "Software Development"
+                    company_domain: "medius.com"
+                    linkedin_username: "medius"
+                    company_name: "Medius"
+                    company_logo: null
+                  - id: 67499799
+                    company_country: "US"
+                    title: "AI Engineer"
+                    normalized_job_title: "machine learning engineer"
+                    regions:
+                      - city: null
+                        state: null
+                        country: "United States"
+                    region: "Remote USA"
+                    description: "Point Wild helps customers monitor, manage, and protect against the risks associated with their identities and personal information in a digital world. Backed by WndrCo, Warburg Pincus and General Catalyst, Point Wild is dedicated to creating the world's most comprehensive portfolio of industry-leading cybersecurity solutions. Our vision is to become THE go-to resource for every cyber protection need individuals may face - today and in the future. Join us for the ride! As an AI Engineer in this group, you'll work side-by-side with cryptographers, quantum computing specialists, and senior AI engineers to develop, deploy, and optimize AI models that support secure key exchange, anomaly detection in quantum networks, and predictive optimization of post-quantum cryptographic systems. This is a hands-on engineering role for someone passionate about applying AI to groundbreaking security technologies — from production-ready ML models to research-driven AI tools for quantum-enhanced systems. Day to Day: AI-Driven Security Enhancements — Design, develop, and maintain ML models for applications like eavesdropping detection, traffic analysis, and quantum channel optimization. Production Integration — Work with MLOps and Data Engineering teams to package, deploy, and monitor AI models within secure, scalable CI/CD pipelines. Quantum Communication Optimization — Apply AI techniques to analyze and improve quantum key distribution (QKD) performance and resilience. Parallel Project Support — Balance multiple AI initiatives, contributing to both experimental research and production-level AI systems within the quantum security space. What you bring to the table: Solid ML & AI Fundamentals — Hands-on experience with supervised/unsupervised learning, anomaly detection, and optimization techniques. Bonus for NLP or time-series analysis. Model Deployment & MLOps Experience — Comfortable working with containerized AI models, secure cloud environments (AWS preferred), and CI/CD for ML. Proficiency in Python & AI Frameworks — Skilled with PyTorch, TensorFlow, Scikit-learn, or equivalent tools. Performance-Driven Mindset — Focused on delivering efficient, scalable AI solutions for production-grade cryptographic systems. Collaborative & Growth-Oriented — Thrives in a cross-disciplinary environment, eager to learn from cryptographers, physicists, and AI peers."
+                    displayed_url: "https://job-boards.greenhouse.io/pointwild/jobs/4754129008"
+                    currency_code: null
+                    min_salary_range: null
+                    max_salary_range: null
+                    avg_salary_range: null
+                    min_hourly_rate: null
+                    max_hourly_rate: null
+                    avg_hourly_rate: null
+                    min_experience_years: null
+                    max_experience_years: null
+                    remote: 0
+                    snapshot_date: "2025-06-10"
+                    created_at: "2025-06-10T08:31:05Z"
+                    updated_at: "2025-06-10T08:32:06Z"
+                    linkedin_company_id: 105810844
+                    inactive: 0
+                    company_number_of_employees: 103
+                    company_employee_size_range: "51-200"
+                    company_industry: "Data Security Software Products"
+                    company_domain: "pointwild.com"
+                    linkedin_username: "point-wild"
+                    company_name: "Point Wild (Formerly Pango Group)"
+                    company_logo: null
+                pagination:
+                  page: 1
+                  per_page: 2
+                  total_pages: 1547
+                  total_items: 3094
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: query
+      name: api_key
+      description: API key for authentication
+
+  schemas:
+    TechSignalsResponse:
+      type: object
+      properties:
+        signals:
+          type: array
+          items:
+            $ref: "#/components/schemas/TechSignal"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+      required:
+        - signals
+        - pagination
+
+    TechSignal:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Signal ID
+        change_date:
+          type: string
+          format: date-time
+          description: Date when the tech change occurred (ISO 8601 format with timezone)
+        change_type:
+          type: string
+          enum:
+            - subscribed
+            - unsubscribed
+            - usage
+            - stop_usage
+            - upgrade
+            - downgrade
+          description: Type of change
+        change_description:
+          type: string
+          description: A description of the tech change
+        linkedin_username:
+          type: string
+          nullable: true
+          description: LinkedIn username of the company
+        linkedin_company_id:
+          type: string
+          nullable: true
+          description: LinkedIn company id of the company
+        domain:
+          type: string
+          description: Company domain/website of the company
+        company_name:
+          type: string
+          description: Name of the company
+        company_logo:
+          type: string
+          format: uri
+          description: URL to company logo
+        company_address:
+          type: string
+          nullable: true
+          description: Company address, if found
+        industry:
+          type: string
+          description: Company industry of the company
+        company_size_range:
+          type: string
+          description: Company size range
+        company_description:
+          type: string
+          description: Company description
+        country:
+          type: string
+          description: Company country
+        vendor_name:
+          type: string
+          nullable: true
+          description: Name of the technology vendor
+        vendor_category:
+          type: string
+          description: Category of the vendor/technology
+        vendor_market:
+          type: string
+          enum:
+            - SMB
+            - Shopify
+            - Mid-Market
+            - Enterprise
+          description: Market segment of the vendor
+        vendor_notes:
+          type: string
+          description: Additional notes about the vendor such as its unique features/topics
+        vendor_market_leader:
+          type: boolean
+          description: Whether vendor is a market leader
+        vendor_url:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to vendor website
+        context_url:
+          type: string
+          format: uri
+          nullable: true
+          description: URL providing context for the signal
+        has_self_service_trial:
+          type: boolean
+          description: Whether vendor offers a self-service trial
+      required:
+        - id
+        - change_date
+        - change_type
+        - change_description
+        - domain
+        - company_name
+        - industry
+        - company_size_range
+        - country
+        - vendor_category
+        - vendor_market
+        - vendor_market_leader
+        - has_self_service_trial
+
+    JobsResponse:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobPosting"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+      required:
+        - jobs
+        - pagination
+
+    JobPosting:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Job Posting ID
+        company_country:
+          type: string
+          description: Country code of the company that published the job posting
+        title:
+          type: string
+          description: The job title, as specified by the company
+        normalized_job_title:
+          type: string
+          description: The normalized job title. For instance, job titles like "java engineer", "aws engineer", all get normalized to "backend engineer" based on our machine learning algorithm. The entire list of normalized job titles can be found here https://bloomberry.com/normalized-job_titles
+        regions:
+          type: array
+          items:
+            type: string
+          description: An array of structured regions/locations for this job posting. If we are not able to parse/convert the raw region to a structured list, this is an empty list
+        region:
+          type: string
+          description: The raw region we extracted from the job posting (unstructured)
+        description:
+          type: string
+          description: The full-text job description
+        displayed_url:
+          type: string
+          format: uri
+          description: The URL of the job posting
+        currency_code:
+          type: string
+          nullable: true
+          description: The currency code of the salary of the job, if found in the job description
+        min_salary_range:
+          type: number
+          nullable: true
+          description: The minimum salary range, if found in the job description
+        max_salary_range:
+          type: number
+          nullable: true
+          description: The maximum salary range, if found in the job description
+        avg_salary_range:
+          type: number
+          nullable: true
+          description: The average salary range, if found in the job description
+        min_hourly_rate:
+          type: number
+          nullable: true
+          description: The minimum hourly rate, if found in the job description
+        max_hourly_rate:
+          type: number
+          nullable: true
+          description: The maximum hourly rate, if found in the job description
+        avg_hourly_rate:
+          type: number
+          nullable: true
+          description: The average hourly rate, if found in the job description
+        min_experience_years:
+          type: number
+          nullable: true
+          description: The minimum number of years of experience required if found in the job description
+        max_experience_years:
+          type: number
+          nullable: true
+          description: The maximum number of years of experience required if found in the job description
+        remote:
+          type: integer
+          enum: [0, 1]
+          description: 0 if job is not remote, 1 otherwise
+        snapshot_date:
+          type: string
+          format: date
+          description: The date the job posting was found
+        created_at:
+          type: string
+          format: date-time
+          description: The datetime the job posting was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The datetime the job posting was updated
+        linkedin_company_id:
+          type: integer
+          nullable: true
+          description: The LinkedIn company ID of the company associated with this job posting
+        inactive:
+          type: integer
+          enum: [0, 1]
+          description: 1 if the job posting has been taken down, 0 if it's still up. Note there may be a lag on when we determine a job posting is inactive
+        company_number_of_employees:
+          type: integer
+          nullable: true
+          description: The number of employees found on LinkedIn for this company
+        company_employee_size_range:
+          type: string
+          description: The employee size range of the company associated with the job posting
+        company_industry:
+          type: string
+          description: The industry of the company associated with the job posting, as taken from its LinkedIn company profile
+        company_domain:
+          type: string
+          description: The website domain of the company associated with the job posting
+        linkedin_username:
+          type: string
+          nullable: true
+          description: The LinkedIn handle of the company associated with the job posting
+        company_name:
+          type: string
+          description: The name of the company associated with the job posting
+        company_logo:
+          type: string
+          format: uri
+          nullable: true
+          description: The URL of the logo of the company associated with the job posting
+      required:
+        - id
+        - title
+        - normalized_job_title
+        - regions
+        - region
+        - description
+        - displayed_url
+        - remote
+        - snapshot_date
+        - created_at
+        - updated_at
+        - inactive
+        - company_employee_size_range
+        - company_industry
+        - company_domain
+        - company_name
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Current page number
+        per_page:
+          type: integer
+          description: Number of items per page
+        total_pages:
+          type: integer
+          description: Total number of pages
+        total_items:
+          type: integer
+          description: Total number of items
+      required:
+        - page
+        - per_page
+        - total_pages
+        - total_items
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: integer
+          description: Error code
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Validation error messages grouped by field
+        message:
+          type: string
+          description: General error message
