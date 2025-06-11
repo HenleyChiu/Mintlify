@@ -6,14 +6,11 @@
   },
   "navigation": [
     {
-      "label": "Introduction",
-      "path": "/"
-    },
-    {
-      "label": "API Reference",
-      "path": "/reference"
+      "group": "API Reference",
+      "pages": [
+        "api-reference"
+      ]
     }
   ],
-  "spec": "openapi.yaml"
+  "openapi": "openapi.yaml"
 }
-
