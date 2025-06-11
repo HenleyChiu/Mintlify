@@ -1,3 +1,19 @@
 {
+  "name": "B2B Sales Signals API",
+  "favicon": "https://bloomberry.com/favicon.ico",
+  "colors": {
+    "primary": "#0063dc"
+  },
+  "navigation": [
+    {
+      "label": "Introduction",
+      "path": "/"
+    },
+    {
+      "label": "API Reference",
+      "path": "/reference"
+    }
+  ],
   "spec": "openapi.yaml"
 }
+
